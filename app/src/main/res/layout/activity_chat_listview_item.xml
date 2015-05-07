@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff">
+
+    <!--消息时间-->
+    <TextView
+        android:id="@+id/msg_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        android:text="04-27 17:00"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/msg_time">
+
+        <!--接收到的消息的格式-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/layout_from_friend"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/friend_head"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/chat_activity_friend_head"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/msg_content_from_friend"
+                android:background="@drawable/chat_activity_msg_from_friend_bg_selector"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:textSize="14sp"/>
+
+        </LinearLayout>
+
+        <!--发出的消息格式-->
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:id="@+id/layout_from_me">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/my_head"
+                android:src="@drawable/chat_activity_my_head"
+                android:layout_alignParentRight="true"/>
+
+            <TextView
+                android:id="@+id/msg_content_from_me"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/my_head"
+                android:background="@drawable/chat_activity_msg_from_me_bg_selector"
+                android:gravity="center_vertical"
+                android:textColor="#000000"
+                android:textSize="14sp"/>
+
+        </RelativeLayout>
+    </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,37 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="120dip"
+    android:layout_height="40dip"
+    android:background="@drawable/chat_activity_listview_item_copy_delete_bg_shape"
+    android:gravity="center"
+    android:orientation="horizontal" >
+
+    <!--复制-->
+    <TextView
+        android:id="@+id/listview_item_copy"
+        android:layout_width="55dip"
+        android:layout_height="40dip"
+        android:gravity="center"
+        android:text="复制"
+        android:textSize="14sp"
+        android:textColor="#ffffff" />
+
+    <!--中间的分割线-->
+    <View
+        android:layout_width="0.1dip"
+        android:layout_height="30dip"
+        android:layout_marginLeft="2dip"
+        android:layout_marginRight="2dip"
+        android:background="#888888" />
+
+    <!--删除-->
+    <TextView
+        android:id="@+id/listview_item_delete"
+        android:layout_width="55dip"
+        android:layout_height="40dip"
+        android:gravity="center"
+        android:text="删除"
+        android:textSize="14sp"
+        android:textColor="#ffffff" />
+
+</LinearLayout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--左布局，主界面向左滑动的布局，用于显示个人信息-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffa2e0ff">
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="设置界面"
+    android:textSize="40sp"/>
+
+</LinearLayout>

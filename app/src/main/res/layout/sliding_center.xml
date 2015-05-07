@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--中间布局，显示主界面-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.vibexie.jianai.MainActivityModule.CenterOfSlidingView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <!--由于scrollView内部只能有一个元素，所以用一个LinearLayout来容纳-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include layout="@layout/sliding_center_top"></include>
+
+            <include layout="@layout/sliding_center_center"></include>
+
+            <include layout="@layout/sliding_center_bottom"></include>
+
+        </LinearLayout>
+
+
+    </com.vibexie.jianai.MainActivityModule.CenterOfSlidingView>
+
+</LinearLayout>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.vibexie.jianai" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".MainActivityModule.MainActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".LoginRegisterModule.LoginActivity"
+            android:label="@string/title_activity_login" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LoginRegisterModule.RegisterForVerifyingCodeActivity"
+            android:label="@string/title_activity_register" >
+        </activity>
+        <activity
+            android:name=".LoginRegisterModule.RegisterInfoActivity"
+            android:label="@string/title_activity_register_info" >
+        </activity>
+
+        <receiver android:name=".BroadcastReceivers.NetworkReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".ChatModule.ChatActivity"
+            android:label="@string/title_activity_chat" >
+        </activity>
+
+        <service android:name=".Services.XMPPservice.XMPPService" />
+
+        <activity
+            android:name=".AddLoverModule.AddLoverActivity"
+            android:label="@string/title_activity_add_lover" >
+        </activity>
+    </application>
+
+</manifest>

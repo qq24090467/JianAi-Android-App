@@ -1,0 +1,127 @@
+/***************************mysql openfire******************************/
+ofUser
++-------------------+--------------+------+-----+---------+-------+
+| Field             | Type         | Null | Key | Default | Extra |
++-------------------+--------------+------+-----+---------+-------+
+| username          | varchar(64)  | NO   | PRI | NULL    |       |
+| plainPassword     | varchar(32)  | YES  |     | NULL    |       |
+| encryptedPassword | varchar(255) | YES  |     | NULL    |       |
+| name              | varchar(100) | YES  |     | NULL    |       |
+| email             | varchar(100) | YES  |     | NULL    |       |
+| creationDate      | char(15)     | NO   | MUL | NULL    |       |
+| modificationDate  | char(15)     | NO   |     | NULL    |       |
++-------------------+--------------+------+-----+---------+-------+
+
+ofUserFlag
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| username  | varchar(64)  | NO   | PRI | NULL    |       |
+| name      | varchar(100) | NO   | PRI | NULL    |       |
+| startTime | char(15)     | YES  | MUL | NULL    |       |
+| endTime   | char(15)     | YES  | MUL | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+
+
+ofVCard
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| username | varchar(64) | NO   | PRI | NULL    |       |
+| vcard    | mediumtext  | NO   |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+
+ofID
++--------+------------+------+-----+---------+-------+
+| Field  | Type       | Null | Key | Default | Extra |
++--------+------------+------+-----+---------+-------+
+| idType | int(11)    | NO   | PRI | NULL    |       |
+| id     | bigint(20) | NO   |     | NULL    |       |
++--------+------------+------+-----+---------+-------+
+
+通过openfire数据库的表的查看，可以看出各张表没有相互关联。
+
+新建一张用户信息表：
+sql:
+create table ofUserInfo(id 
+						username varchar(64) not null primary key,  /*用户名*/
+                        sex varchar(5),								/*性别*/
+                        birthday varchar(20),						/*生日*/
+                        addr varchar(100),							/*地址*/
+                        phone varchar(50),							/*手机号*/
+                        sign varchar(50),							/*签名*/
+                        headimage mediumblob);						/*头像*/
+                       
++-----------+--------------+------+-----+---------+-------+
+| Field     | Type         | Null | Key | Default | Extra |
++-----------+--------------+------+-----+---------+-------+
+| username  | varchar(64)  | NO   | PRI | NULL    |       |
+| realname  | varchar(64)  | YES  |     | NULL    |       |
+| sex       | varchar(5)   | YES  |     | NULL    |       |
+| birthday  | varchar(20)  | YES  |     | NULL    |       |
+| addr      | varchar(100) | YES  |     | NULL    |       |
+| phone     | varchar(50)  | YES  |     | NULL    |       |
+| headimage | mediumblob   | YES  |     | NULL    |       |
++-----------+--------------+------+-----+---------+-------+
+
+新建一张用户信息表
+sql:
+create table ofUserRegister(username varchar(64) not null primary key,	/*用户名*/
+							encryptedPassword varchar(255),				/*加密密码*/
+                            realname varchar(64),						/*真实姓名*/
+                            sex varchar(5),								/*性别*/
+                            birthday varchar(20),						/*生日*/
+                            addr varchar(100),							/*地址*/
+                            phone varchar(50),							/*手机号*/
+                            email varchar(100),							/*邮箱*/
+                            requestTime varchar(100),					/*申请验证码时间*/
+                            identifyingCode varchar(6));				/*验证码*/
+                            
++-------------------+--------------+------+-----+---------+-------+
+| Field             | Type         | Null | Key | Default | Extra |
++-------------------+--------------+------+-----+---------+-------+
+| username          | varchar(64)  | NO   | PRI | NULL    |       |
+| encryptedPassword | varchar(255) | YES  |     | NULL    |       |
+| realname          | varchar(64)  | YES  |     | NULL    |       |
+| sex               | varchar(5)   | YES  |     | NULL    |       |
+| birthday          | varchar(20)  | YES  |     | NULL    |       |
+| addr              | varchar(100) | YES  |     | NULL    |       |
+| phone             | varchar(50)  | YES  |     | NULL    |       |
+| email             | varchar(100) | YES  |     | NULL    |       |
+| requestTime       | varchar(100) | YES  |     | NULL    |       |
+| identifyingCode   | varchar(6)   | YES  |     | NULL    |       |
++-------------------+--------------+------+-----+---------+-------+
+
+/*******************************************用户注册***********************************************/
+	客户端的登录界面输入:输入帐号，密码，确认密码，真实姓名，性别，生日，地址，手机号，邮箱
+	客户端界面必须输入上面所有有效的信息，才可以点击注册按钮向服务器提交所有的信息。
+
+	服务器端数据库保存一张保存提交了注册但是未通过验证的的用户的用户表registerUsers;
+	registerUsers的字段有:id,用户名，密码，确认密码，真实姓名，性别，生日，地址，手机号，邮箱,提交时间，系统返回的6位验证码。
+	用户验证有效期为3分钟。系统每10分钟通过判断registerUsers中的提交时间字段是否过期删除在registerUsers表中未验证的用户。
+
+	服务器端servlet获取用户提交的注册信息
+			判断此用户是否在openfire中的ofUser表(成功注册过用户)中已存在?
+			@存在---则向客户端返回用户已存在，要求用户重新输入用户名;
+			@不存在---判断此邮箱是否在openfire中的ofUser表(成功注册过用户)中已存在
+				@存在---则向客户端返回此邮箱已绑定用户，要求用户重新输入邮箱;
+				|
+				@不存在---则在registerUsers表查询该用户是否存在?
+					@存在---则判断是否过期?
+					|	@过期---则立即删除，产生验证码，重新插入该用户的信息，并将验证码返回给注册邮箱，要求客户端显示验证码dialog;
+					|	|			
+					|	@未过期---匹配用户名和邮箱是否相同?
+					|		@相同---更新除验证码之外的字段返回客户端（防止用户修改了注册信息），要求客户端显示输入验证码dialog;
+					|		|
+					|		@不同---说明另外一个用户申请同样的用户名，则返回该客户端用户已存在，请重新输入用户名；
+					@不存在---产生验证码发送到注册邮箱,返回给客户端输入验证码指令，客户端显示输入验证码dialog;
+	
+	用户在注册邮箱接收验证码，并在验证码输入dialog中输入验证码。确认按钮提交用户信息及验证码。
+	注意客户端显示dialog时立即计时，3分钟内还没有确认验证码，取消dialog。
+	因为3分钟内还没有确认验证码，取消dialog，所以用户只能再次请求新验证码，所以不用判断用户是否存在，用户是否过期。
+	servlet接收用户信息及验证码，不用与registerUsers表中的数据匹配，因为出现了dialog,肯定在registerUsers存在该用户。
+	由servlet向openfire请求注册用户。注册成功？
+		@成功---服务器端将该新用户与admin用户互相加为好友，返回给用户注册成功。客户端自动进入登入界面
+		|
+		@失败---返回给客户端注册失败，客户端取消dialog（这种情况几乎不发生，但要考虑服务器发生错误的可能性）
+/**************************************************************************************************

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--右布局，主界面向左滑动的布局，是情侣笔记的界面-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffffff">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="这是通知界面，左边红色是通知提示"
+        android:textColor="#ff000000"
+        android:textSize="30sp"
+        android:gravity="center_horizontal"
+        />
+</RelativeLayout>
