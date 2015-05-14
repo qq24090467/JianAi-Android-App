@@ -4,15 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!--顶部-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="#18b4ed"
-        android:orientation="horizontal">
-
-
-    </LinearLayout>
+    <!--这里原本打算显示对方的状态，但是为了简洁，这里去掉了-->
+    <!--&lt;!&ndash;顶部&ndash;&gt;-->
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:background="#18b4ed"-->
+        <!--android:orientation="horizontal">-->
+    <!--</LinearLayout>-->
 
     <!--消息显示界面和消息输入等，之所以在一个linearLayout里面，是在动态设置layout_weight属性的时候不会影响到顶部-->
     <LinearLayout
@@ -25,19 +24,28 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!--listView用于显示聊天消息,transcriptMode是一个关键-->
-            <ListView
+            <com.vibexie.jianai.MiniPTR.MiniPTRFrame
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_above="@+id/bottom"
-                android:layout_alignParentTop="true"
-                android:id="@+id/msgListView"
-                android:dividerHeight="0dp"
-                android:divider="#ffffff"
-                android:background="#ffffff"
-                android:transcriptMode="alwaysScroll">
+                android:id="@+id/chat_miniptr_frame"
+                android:layout_alignParentTop="true">
 
-            </ListView>
+                <include layout="@layout/miniptr_head"></include>
+
+                <!--listView用于显示聊天消息,transcriptMode是一个关键-->
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/msgListView"
+                    android:dividerHeight="0dp"
+                    android:divider="#ffffff"
+                    android:background="#ffffff"
+                    android:transcriptMode="alwaysScroll">
+
+                </ListView>
+
+            </com.vibexie.jianai.MiniPTR.MiniPTRFrame>
 
             <!--底部布局-->
             <LinearLayout
@@ -69,18 +77,19 @@
 
                     </LinearLayout>
 
-                    <!--选择其他发送内容按钮-->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="50dp"
-                        android:layout_weight="2"
-                        android:gravity="center_vertical|center_horizontal">
-                        <Button
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:background="@drawable/chat_activity_send_others_button"
-                            android:id="@+id/send_others_button"/>
-                    </LinearLayout>
+                    <!--发送其它的功能在之后的版本中加入-->
+                    <!--&lt;!&ndash;选择其他发送内容按钮&ndash;&gt;-->
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="0dp"-->
+                        <!--android:layout_height="50dp"-->
+                        <!--android:layout_weight="2"-->
+                        <!--android:gravity="center_vertical|center_horizontal">-->
+                        <!--<Button-->
+                            <!--android:layout_width="30dp"-->
+                            <!--android:layout_height="30dp"-->
+                            <!--android:background="@drawable/chat_activity_send_others_button"-->
+                            <!--android:id="@+id/send_others_button"/>-->
+                    <!--</LinearLayout>-->
 
                     <!--输入消息-->
                     <LinearLayout
@@ -101,24 +110,27 @@
                             android:paddingLeft="3dp"/>
                     </LinearLayout>
 
-                    <!--发送按钮和发送语音按钮-->
+                    <!--发送按钮-->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="60dp"
                         android:layout_weight="3"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="2dp"
                         android:gravity="center_vertical|center_horizontal">
 
                         <LinearLayout
-                            android:layout_width="50dp"
+                            android:layout_width="match_parent"
                             android:layout_height="35dp"
-                            android:background="@drawable/chat_activity_send_sound_button_shape"
+                            android:background="@drawable/chat_activity_send_button_shape"
                             android:gravity="center_horizontal|center_vertical">
 
                             <Button
-                                android:layout_width="45dp"
-                                android:layout_height="28dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
                                 android:id="@+id/send_msg_button"
-                                android:background="@drawable/chat_activity_send_sound_button"/>
+                                android:textSize="12sp"
+                                android:text="发送" />
 
                         </LinearLayout>
 

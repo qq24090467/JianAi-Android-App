@@ -6,7 +6,7 @@
                 android:background="@drawable/main_activity_background">
 
     <!--自定义的viewGroup-->
-    <com.vibexie.jianai.MainActivityModule.SlidingView
+    <com.vibexie.jianai.MainActivity.SlidingView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none">
@@ -30,5 +30,5 @@
 
         </LinearLayout>
 
-    </com.vibexie.jianai.MainActivityModule.SlidingView>
+    </com.vibexie.jianai.MainActivity.SlidingView>
 </RelativeLayout>

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.vibexie.jianai.MainActivityModule.CenterOfSlidingView
+    <com.vibexie.jianai.MainActivity.CenterOfSlidingView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none">
@@ -24,6 +24,6 @@
         </LinearLayout>
 
 
-    </com.vibexie.jianai.MainActivityModule.CenterOfSlidingView>
+    </com.vibexie.jianai.MainActivity.CenterOfSlidingView>
 
 </LinearLayout>

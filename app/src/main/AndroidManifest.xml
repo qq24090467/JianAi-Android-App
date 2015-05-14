@@ -13,25 +13,27 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
-            android:name=".MainActivityModule.MainActivity"
+            android:name=".MainActivity.MainActivity"
             android:label="@string/app_name" >
-        </activity>
-        <activity
-            android:name=".LoginRegisterModule.LoginActivity"
-            android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".LoginRegisterModule.RegisterForVerifyingCodeActivity"
+            android:name=".LoginRegister.LoginActivity"
+            android:label="@string/title_activity_login" >
+        </activity>
+        <activity
+            android:name=".LoginRegister.RegisterForVerifyingCodeActivity"
             android:label="@string/title_activity_register" >
         </activity>
         <activity
-            android:name=".LoginRegisterModule.RegisterInfoActivity"
+            android:name=".LoginRegister.RegisterInfoActivity"
             android:label="@string/title_activity_register_info" >
         </activity>
 
@@ -42,14 +44,14 @@
         </receiver>
 
         <activity
-            android:name=".ChatModule.ChatActivity"
+            android:name=".Chat.ChatActivity"
             android:label="@string/title_activity_chat" >
         </activity>
 
         <service android:name=".Services.XMPPservice.XMPPService" />
 
         <activity
-            android:name=".AddLoverModule.AddLoverActivity"
+            android:name=".AddLover.AddLoverActivity"
             android:label="@string/title_activity_add_lover" >
         </activity>
     </application>
