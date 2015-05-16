@@ -94,9 +94,8 @@ public class MainActivity extends Activity{
 
         RoundImageView myHead=(RoundImageView)this.findViewById(R.id.sliding_left_my_head);
 
-        //myHead.setImageResource(R.drawable.main_activity_head);
-        //myHead.invalidate();
-
+        myHead.invalidate();
+        myHead.setImageResource(R.drawable.main_activity_head);
     }
 
 
@@ -113,8 +112,6 @@ public class MainActivity extends Activity{
          * 解除绑定XMPPService
          */
         unbindService(serviceConnection);
-
-
     }
 
     /*************************************************************************************************/

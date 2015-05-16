@@ -93,8 +93,7 @@ public class RoundImageView extends ImageView {
 	@Override
 	public void invalidate(){
 		mWeakBitmap = null;
-		if (mMaskBitmap != null)
-		{
+		if (mMaskBitmap != null) {
 			mMaskBitmap.recycle();
 			mMaskBitmap = null;
 		}
