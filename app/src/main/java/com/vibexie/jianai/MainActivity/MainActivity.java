@@ -26,6 +26,7 @@ import com.vibexie.jianai.Services.XMPPservice.XMPPService;
 import com.vibexie.jianai.Utils.ActivityStackManager;
 
 import com.vibexie.jianai.R;
+import com.vibexie.jianai.Utils.RoundImageView;
 import com.vibexie.jianai.Utils.TimeUtil;
 
 import org.json.JSONException;
@@ -43,6 +44,8 @@ public class MainActivity extends Activity{
 
     private ImageButton chatImageButton;
 
+    /*以下3个参数在sqlite中获取*/
+
     /**
      * XMPP用户名
      */
@@ -52,6 +55,11 @@ public class MainActivity extends Activity{
      * XMPP用户密码
      */
     private static final String XMPPPASSWORD="test1";
+
+    /**
+     * XMPP lover的用户名
+     */
+    private static final String XMPPLOVERNAME="test2";
 
     /**
      * 标记XMPPConnectNetworkReceiver只注册一次
@@ -79,10 +87,15 @@ public class MainActivity extends Activity{
         chatImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this,ChatActivity.class);
+                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                 startActivity(intent);
             }
         });
+
+        RoundImageView myHead=(RoundImageView)this.findViewById(R.id.sliding_left_my_head);
+
+        //myHead.setImageResource(R.drawable.main_activity_head);
+        //myHead.invalidate();
 
     }
 
@@ -232,7 +245,7 @@ public class MainActivity extends Activity{
         /**
          * 收到lover的消息
          */
-        if(fromWho.equals("test2")){
+        if(fromWho.equals(XMPPLOVERNAME)){
             ChatMsgBean chatMsgBean=new ChatMsgBean();
             chatMsgBean.setMsgTime(TimeUtil.getCurrentStandardTime());
             chatMsgBean.setMsgContent(message);
