@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:circleProgressBar="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/progress_title"
+        android:background="#87CEFF"
+        android:gravity="center_horizontal|center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="添加你的另一半"
+            android:textSize="25sp"
+            android:textColor="#000000"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/progress_title"
+        android:id="@+id/progress_input"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
+        android:gravity="center_vertical|center_horizontal">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progress_lovername"
+            android:hint="请输入另一半的用户名"
+            android:textSize="25sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/progress_input"
+        android:id="@+id/progress_prompt"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
+        android:visibility="gone"
+        android:gravity="center_vertical|center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="提示"
+            android:textSize="25sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/progress_prompt"
+        android:id="@+id/progress_bar"
+        android:visibility="visible"
+        android:gravity="center_horizontal">
+
+        <com.vibexie.jianai.LoginRegister.CircleProgressBar
+            android:id="@+id/circleProgressBar"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            circleProgressBar:innerColor="#ff1f8a3c"
+            circleProgressBar:outerColor="#ffa60a0e"
+            circleProgressBar:ringWidth="10dp"
+            circleProgressBar:innerCircleRadius="50dp"
+            circleProgressBar:progressTextSize="15dp"
+            circleProgressBar:speed="3"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50sp"
+        android:layout_below="@+id/progress_bar"
+        android:id="@+id/progress_buttons"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:background="#87CEFF"
+            android:id="@+id/progress_confirm"
+            android:text="确定"/>
+
+        <LinearLayout
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#61223010"></LinearLayout>
+
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:id="@+id/progress_cancel"
+            android:background="#87CEFF"
+            android:text="取消"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

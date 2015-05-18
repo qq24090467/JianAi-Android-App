@@ -41,7 +41,11 @@ public class XMPPConnectionManager {
              */
             connectionConfiguration = new ConnectionConfiguration(ServerConf.OPENFIRE_SERVER_IP, 5222, ServerConf.OPENFIRE_SERVER_HOSTNAME);
             connectionConfiguration.setReconnectionAllowed(true);
-            connectionConfiguration.setSendPresence(true);
+
+            /**
+             * 设置离线
+             */
+            connectionConfiguration.setSendPresence(false);
         }
 
         return connectionConfiguration;

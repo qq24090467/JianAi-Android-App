@@ -65,6 +65,9 @@ public class LoginActivity extends Activity {
         initWidgets();
 
         initClickListener();
+
+        AddLoverDialog addLoverDialog=new AddLoverDialog(this);
+        addLoverDialog.show();
     }
 
 

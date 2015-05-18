@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MyProgressBar">
+        <attr name="innerColor" format="color"/>
+        <attr name="outerColor" format="color"/>
+        <!--内圆的半径-->
+        <attr name="innerCircleRadius" format="dimension"/>
+        <!--圆环的宽度-->
+        <attr name="ringWidth" format="dimension"/>
+        <!--进度文本字体大小-->
+        <attr name="progressTextSize" format="dimension"/>
+        <attr name="speed" format="integer"/>
+    </declare-styleable> 
+</resources>

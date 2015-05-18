@@ -1,31 +1,32 @@
-package com.vibexie.jianai.MainActivity;
+package com.vibexie.jianai.LoginRegister;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageButton;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.vibexie.jianai.Chat.ChatActivity;
 import com.vibexie.jianai.Dao.Bean.ChatMsgBean;
 import com.vibexie.jianai.Dao.DBHelper.UserDBHelper;
 import com.vibexie.jianai.Dao.DBManager.DBManager;
-import com.vibexie.jianai.Services.XMPPservice.XMPPService;
-import com.vibexie.jianai.Utils.ActivityStackManager;
-
 import com.vibexie.jianai.R;
+import com.vibexie.jianai.Services.XMPPservice.XMPPService;
 import com.vibexie.jianai.Utils.TimeUtil;
 
 import org.json.JSONException;
@@ -34,80 +35,116 @@ import org.json.JSONObject;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
-public class MainActivity extends Activity{
-    /**
-     * 持有SlidingView.InnerClassOfSlidingView对象，用于button控制HorizontalScrollView的滑动
-     */
-    private SlidingView.InnerClassOfSlidingView innerClassOfSlidingView=new SlidingView.InnerClassOfSlidingView();
-
-    private ImageButton chatImageButton;
-
-    /*以下3个参数在sqlite中获取*/
+/**
+ * Created by vibexie on 5/18/15.
+ */
+public class AddLoverDialog {
+    Context context;
 
     /**
      * XMPP用户名
      */
-    private static final String XMPPUSERNAME="test2";
+    private String XMPPUSERNAME="test2";
 
     /**
      * XMPP用户密码
      */
-    private static final String XMPPPASSWORD="test2";
-
-    /**
-     * XMPP lover的用户名
-     */
-    private static final String XMPPLOVERNAME="admin";
+    private String XMPPPASSWORD="test2";
 
     /**
      * 标记XMPPConnectNetworkReceiver只注册一次
      */
     private static boolean isXMPPConnectNetworkReceiverRegistered=false;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    /**
+     * 相关控件
+     */
+    private CircleProgressBar circleProgressBar;
+    private LinearLayout inputLinearLayout,promptLinearLayout;
+    private EditText loverName;
+    private Button confirm,cancle;
 
-        /**
-         * 压入到ActivityStack中
-         */
-        ActivityStackManager.getInstance().push(this);
+    public AddLoverDialog(Context context){
+        this.context=context;
 
         /**
          * 初始化XMPP服务
          */
         initService(XMPPUSERNAME,XMPPPASSWORD);
+    }
 
-        chatImageButton=(ImageButton)this.findViewById(R.id.chat);
+    public void show(){
+        LayoutInflater layoutInflater=LayoutInflater.from(context);
+        View view=layoutInflater.inflate(R.layout.activity_login_addlover_layout, null);
 
-        chatImageButton.setOnClickListener(new View.OnClickListener() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        /**
+         * 设置布局
+         */
+        builder.setView(view);
+
+        builder.setCancelable(false);
+
+        builder.create();
+
+        /**
+         * 上转型为AlertDialog，因为AlertDialog有dismiss()方法
+         */
+        final AlertDialog alertDialog=builder.show();
+
+        /**
+         *  必须获取alertDialog的Window对象，否这不能closeDialog=(Button)window.findViewById(R.id.closeDialog);
+         */
+        Window window=alertDialog.getWindow();
+
+        /**
+         * 获取相关控件
+         */
+        circleProgressBar=(CircleProgressBar)window.findViewById(R.id.circleProgressBar);
+        inputLinearLayout=(LinearLayout)window.findViewById(R.id.progress_input);
+        promptLinearLayout=(LinearLayout)window.findViewById(R.id.progress_prompt);
+        loverName=(EditText)window.findViewById(R.id.progress_lovername);
+        confirm=(Button)window.findViewById(R.id.progress_confirm);
+        cancle=(Button)window.findViewById(R.id.progress_cancel);
+
+        /**
+         * 设置circleProgressBar文本
+         */
+        circleProgressBar.setText("等候输入");
+
+
+        confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                startActivity(intent);
+                if(loverName.getText().toString().equals("")){
+                    Toast.makeText(context,"请输入用户名",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+            }
+        });
+
+        cancle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /**
+                 * 退出解绑service
+                 */
+                context.unbindService(serviceConnection);
+
+                alertDialog.dismiss();
             }
         });
     }
 
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
 
-        /**
-         * 从ActivityStack中弹出
-         */
-        ActivityStackManager.getInstance().pop(this);
 
-        /**
-         * 解除绑定XMPPService
-         */
-        unbindService(serviceConnection);
-    }
 
-    /*************************************************************************************************/
+
+
 
     /**
      * 接收消息的信使，在这里调用distributeMessage对消息进行处理
@@ -130,8 +167,6 @@ public class MainActivity extends Activity{
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-            innerClassOfSlidingView.toggleOfSlidingRemind();
         }
     });
 
@@ -155,7 +190,7 @@ public class MainActivity extends Activity{
     /**
      * 网络已经重新连接的广播接收者
      */
-    class XMPPConnectNetworkReceiver extends BroadcastReceiver{
+    class XMPPConnectNetworkReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -163,7 +198,7 @@ public class MainActivity extends Activity{
 
             initService(XMPPUSERNAME,XMPPPASSWORD);
 
-            Toast.makeText(context,"网络已连接,正在重新登录...",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "网络已连接,正在重新登录...", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -181,7 +216,7 @@ public class MainActivity extends Activity{
             XMPPConnectNetworkReceiver xmppConnectNetworkReceiver=new XMPPConnectNetworkReceiver();
             IntentFilter intentFilter=new IntentFilter();
             intentFilter.addAction("com.vibexie.jianai.MainActivityModule.MainActivity.XMPP");
-            MainActivity.this.registerReceiver(xmppConnectNetworkReceiver,intentFilter);
+            context.registerReceiver(xmppConnectNetworkReceiver, intentFilter);
         }
 
         isXMPPConnectNetworkReceiverRegistered=true;
@@ -189,10 +224,10 @@ public class MainActivity extends Activity{
         /**
          * 绑定XMPPService
          */
-        bindService(new Intent(MainActivity.this,XMPPService.class),serviceConnection, Context.BIND_AUTO_CREATE);
+        context.bindService(new Intent(context, XMPPService.class), serviceConnection, Context.BIND_AUTO_CREATE);
 
         /**
-         * 因为绑定service需要一小段时间，必须在成功绑定service后才能与service握手，所以延迟1500ms
+         * 因为绑定service需要一小段时间，必须在成功绑定service后才能与service握手，所以延迟1000ms
          */
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
@@ -222,7 +257,7 @@ public class MainActivity extends Activity{
                 }
 
             }
-        },1500);
+        },1000);
     }
 
     /**
@@ -232,45 +267,6 @@ public class MainActivity extends Activity{
      */
     public void distributeMessage(String fromWho,String message){
 
-        /**
-         * 收到lover的消息
-         */
-        if(fromWho.equals(XMPPLOVERNAME)){
-            ChatMsgBean chatMsgBean=new ChatMsgBean();
-            chatMsgBean.setMsgTime(TimeUtil.getCurrentStandardTime());
-            chatMsgBean.setMsgContent(message);
-            chatMsgBean.setFromOrTo(0);
-            chatMsgBean.setRead(0);
 
-            /**
-             * 插入该消息在数据表中的_id
-             */
-            int _id=0;
-
-            UserDBHelper userDBHelper=new UserDBHelper(MainActivity.this,"100002.db");
-            DBManager dbManager=new DBManager(userDBHelper);
-
-            if(dbManager.insertBean("friend_msg",chatMsgBean)){
-
-                String sql="select max(_id) from friend_msg;";
-                Cursor cursor=dbManager.getSqLiteDatabase().rawQuery(sql,null);
-                while (cursor.moveToNext()){
-                    _id=cursor.getInt(0);
-                }
-            }
-
-            /**
-             * 广播通知ChatActivity从数据库中读取该消息并显示,广播中携带了该消息的_id
-             */
-            Intent intent=new Intent();
-            intent.setAction("com.vibexie.jianai.ChatModule.ChatActivity.MsgUpdate");
-            intent.putExtra("_id",_id);
-            getApplicationContext().sendBroadcast(intent);
-
-            /**
-             * 关闭数据库管理连接
-             */
-            dbManager.close();
-        }
     }
 }

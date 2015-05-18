@@ -18,7 +18,6 @@ import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.packet.Presence;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -65,6 +64,8 @@ public class XMPPService extends Service{
      * 这里设置为静态，是为了其它类可以直接获取该chatManager
      */
     public static ChatManager chatManager;
+
+    private static XMPPConnection tmpXMPPConnection;
 
 
     @Override
@@ -171,15 +172,31 @@ public class XMPPService extends Service{
             chatManager=xmppConnection.getChatManager();
 
             /**
-             * 登录状态为在线
-             */
-            Presence presence = new Presence(Presence.Type.available);
-            xmppConnection.sendPacket(presence);
-
-            /**
              * 收到好友邀请后manual表示需要经过同意,accept_all表示不经同意自动为好友
              */
-            Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
+            xmppConnection.getRoster().setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
+
+            /**
+             * 在新线程中接收离线消息
+             */
+            tmpXMPPConnection=xmppConnection;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    /**
+                     * 处理离线消息
+                     */
+                    OfflineMsgManager offlineMsgManager=new OfflineMsgManager(tmpXMPPConnection,msgFromServerHandler);
+                    offlineMsgManager.getOffLineMsg();
+                }
+            }).start();
+
+//            //这里将登录状态状态在离线消息中设置更加合理
+//            /**
+//             * 登录状态为在线
+//             */
+//            Presence presence = new Presence(Presence.Type.available);
+//            xmppConnection.sendPacket(presence);
 
             /**
              * 获取聊天管理对象
@@ -231,7 +248,6 @@ public class XMPPService extends Service{
             MyChatManagerListener myChatManagerListener=new MyChatManagerListener();
             Log.v(TAG,"开始监听消息......");
             chatManager.addChatListener(myChatManagerListener);
-
 
             class MyConnectionListener implements ConnectionListener{
 
