@@ -14,7 +14,7 @@ public class ServerConf {
     /**
      * openfire服务器IP地址，使用openfire默认端口5222
      */
-    public static String OPENFIRE_SERVER_IP="10.0.0.100";
+    public static String OPENFIRE_SERVER_IP="192.168.31.100";
 
     /**
      * openfire服务器主机名
@@ -24,7 +24,7 @@ public class ServerConf {
     /**
      * Servlet服务器地址,必须带端口，如：http://vibexie.com:8080/,默认80端口
      */
-    public static String SERVER_ADDR="http://10.0.0.100:8080/";
+    public static String SERVER_ADDR="http://192.168.31.100:8080/";
 
     /**
      * 用户注册的servlet URL地址
