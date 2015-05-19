@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.vibexie.jianai.Dao.Bean.UserBean;
 import com.vibexie.jianai.Utils.ActivityStackManager;
 import com.vibexie.jianai.Constants.RegisterAndRegisterCmd;
 import com.vibexie.jianai.Constants.ServerConf;
@@ -66,8 +67,18 @@ public class LoginActivity extends Activity {
 
         initClickListener();
 
-        AddLoverDialog addLoverDialog=new AddLoverDialog(this);
-        addLoverDialog.show();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                GetUserInfoFromServer getUserInfoFromServer=new GetUserInfoFromServer("admin",LoginActivity.this);
+
+                UserBean userBean=getUserInfoFromServer.getMyInfo();
+
+                Toast.makeText(LoginActivity.this,userBean.getEmail(),Toast.LENGTH_SHORT).show();
+            }
+        }).start();
+
+
     }
 
 
@@ -161,12 +172,15 @@ public class LoginActivity extends Activity {
 
                             progressDialog.dismiss();
 
-                            /**
-                             * 切换到MainActivity，并finish本activity
-                             */
-                            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                            AddLoverDialog addLoverDialog=new AddLoverDialog(LoginActivity.this,username,password);
+                            addLoverDialog.show();
+
+//                            /**
+//                             * 切换到MainActivity，并finish本activity
+//                             */
+//                            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+//                            startActivity(intent);
+//                            finish();
 
                         }else if(result.equals(RegisterAndRegisterCmd.RESPONSE_LOGIN_PASSWORD_WRONG)){
                             /*密码错误*/

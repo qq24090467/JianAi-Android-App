@@ -180,6 +180,7 @@ public class XMPPService extends Service{
              * 在新线程中接收离线消息
              */
             tmpXMPPConnection=xmppConnection;
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {

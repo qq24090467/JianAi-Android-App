@@ -31,6 +31,23 @@ public class RegisterAndRegisterCmd {
     public static String REQUEST_LOGIN="130";
 
     /**
+     * 请求添加lover
+     */
+    public static final String REQUEST_ADDLOVER_ADD="140";
+
+    /**
+     * 请求获取自己信息
+     */
+    public static final String REQUEST_MY_INFO="150";
+
+    /**
+     * 请求获取lover信息
+     */
+    public static final String REQUEST_LOVER_INFO="160";
+
+
+
+    /**
      * 服务器返回，成功发送验证码给该邮箱
      */
     public static String RESPONSE_EMAIL_SEND_SUCCESS="200";
@@ -89,4 +106,14 @@ public class RegisterAndRegisterCmd {
      * 服务器返回，用户不存在
      */
     public static String RESPONSE_LOGIN_USER_NOT_EXIST="232";
+
+    /**
+     * 服务器返回，添加另一半成功
+     */
+    public static String RESPONSE_LOVERADD_SUCCESS="240";
+
+    /**
+     * 服务器返回，添加另一半失败
+     */
+    public static String RESPONSE_LOVERADD_FAIL="241";
 }

@@ -60,7 +60,7 @@ public class CircleProgressBar extends View {
     /**
      * 显示的文本
      */
-    private String text="等候输入";
+    private String text="等候您的输入";
 
     public CircleProgressBar(Context context) {
         this(context, null);
@@ -118,23 +118,18 @@ public class CircleProgressBar extends View {
         /**
          * 绘图线程
          */
-        new Thread()
-        {
-            public void run()
-            {
-                while (true)
-                {
+        new Thread() {
+            public void run() {
+                while (true) {
                     currentProgress++;
-                    if (currentProgress == 360)
-                    {
+                    if (currentProgress == 360) {
                         currentProgress = 0;
                     }
                     postInvalidate();
-                    try
-                    {
+
+                    try {
                         Thread.sleep(speed);
-                    } catch (InterruptedException e)
-                    {
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
@@ -177,7 +172,7 @@ public class CircleProgressBar extends View {
         /**
          * 进度文本的X坐标
          */
-        int progressX=(int)(x/2);
+        int progressX=(int)(x-(3*progressTextSize));
         int progressY=y+(progressTextSize/2);
         /**
          * 用于定义的圆弧的形状和大小的界限

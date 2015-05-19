@@ -4,11 +4,9 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.database.Cursor;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -20,18 +18,26 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vibexie.jianai.Dao.Bean.ChatMsgBean;
-import com.vibexie.jianai.Dao.DBHelper.UserDBHelper;
-import com.vibexie.jianai.Dao.DBManager.DBManager;
+import com.vibexie.jianai.Constants.RegisterAndRegisterCmd;
+import com.vibexie.jianai.Constants.ServerConf;
 import com.vibexie.jianai.R;
+import com.vibexie.jianai.Services.XMPPservice.XMPPConnectionManager;
 import com.vibexie.jianai.Services.XMPPservice.XMPPService;
-import com.vibexie.jianai.Utils.TimeUtil;
+import com.vibexie.jianai.Utils.HttpClientUtil;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.XMPPException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -44,12 +50,12 @@ public class AddLoverDialog {
     /**
      * XMPP用户名
      */
-    private String XMPPUSERNAME="test2";
+    private String XMPPUSERNAME;
 
     /**
      * XMPP用户密码
      */
-    private String XMPPPASSWORD="test2";
+    private String XMPPPASSWORD;
 
     /**
      * 标记XMPPConnectNetworkReceiver只注册一次
@@ -57,15 +63,33 @@ public class AddLoverDialog {
     private static boolean isXMPPConnectNetworkReceiverRegistered=false;
 
     /**
+     * 广播接收者，在这里声明是为了注销广播
+     */
+    XMPPConnectNetworkReceiver xmppConnectNetworkReceiver;
+
+    ChatManager chatManager;
+
+    Chat chat;
+
+    /**
      * 相关控件
      */
+    private TextView title;
     private CircleProgressBar circleProgressBar;
     private LinearLayout inputLinearLayout,promptLinearLayout;
     private EditText loverName;
     private Button confirm,cancle;
+    private AlertDialog mAlertDialog;
 
-    public AddLoverDialog(Context context){
+    /**
+     * 从控件中获取的loverName
+     */
+    private String name;
+
+    public AddLoverDialog(Context context,String xmppUsername,String xmppPassword){
         this.context=context;
+        this.XMPPUSERNAME=xmppUsername;
+        this.XMPPPASSWORD=xmppPassword;
 
         /**
          * 初始化XMPP服务
@@ -92,6 +116,7 @@ public class AddLoverDialog {
          * 上转型为AlertDialog，因为AlertDialog有dismiss()方法
          */
         final AlertDialog alertDialog=builder.show();
+        mAlertDialog=alertDialog;
 
         /**
          *  必须获取alertDialog的Window对象，否这不能closeDialog=(Button)window.findViewById(R.id.closeDialog);
@@ -101,6 +126,7 @@ public class AddLoverDialog {
         /**
          * 获取相关控件
          */
+        title=(TextView)window.findViewById(R.id.progress_title_textview);
         circleProgressBar=(CircleProgressBar)window.findViewById(R.id.circleProgressBar);
         inputLinearLayout=(LinearLayout)window.findViewById(R.id.progress_input);
         promptLinearLayout=(LinearLayout)window.findViewById(R.id.progress_prompt);
@@ -111,40 +137,219 @@ public class AddLoverDialog {
         /**
          * 设置circleProgressBar文本
          */
-        circleProgressBar.setText("等候输入");
+        circleProgressBar.setText("等候您的输入");
 
 
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(loverName.getText().toString().equals("")){
+                name=loverName.getText().toString();
+                if(name.equals("")){
                     Toast.makeText(context,"请输入用户名",Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                chatManager=XMPPService.chatManager;
+
+                chat=chatManager.createChat(name+"@"+ ServerConf.OPENFIRE_SERVER_HOSTNAME, null);
+
+                /**
+                 * 发出添加好友请求
+                 */
+                try {
+                    chat.sendMessage(RegisterAndRegisterCmd.REQUEST_ADDLOVER_ADD);
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+
+                    /**
+                     * 发送失败返回
+                     */
+                    return;
+                }
+
+                inputLinearLayout.setVisibility(View.GONE);
+                circleProgressBar.setText("等候对方确认");
+                title.setText("添加请求已发出");
+
+                confirm.setClickable(false);
             }
         });
 
         cancle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                /**
-                 * 退出解绑service
-                 */
-                context.unbindService(serviceConnection);
-
-                alertDialog.dismiss();
+                dismiss();
             }
         });
     }
 
+    /**
+     * dismiss Dialog的方法
+     */
+    private void dismiss(){
+        if(mAlertDialog!=null && mAlertDialog.isShowing()){
+
+            /**
+             * 注销广播接收者
+             */
+            if(xmppConnectNetworkReceiver!=null){
+                context.unregisterReceiver(xmppConnectNetworkReceiver);
+            }
+
+            /**
+             * 解绑service
+             */
+            context.unbindService(serviceConnection);
+
+            mAlertDialog.dismiss();
+        }
+    }
+
+    /**
+     * 对接收到的消息进行处理并进行分发，也就是处理消息的具体实现
+     * @param fromWho
+     * @param message
+     */
+    public void distributeMessage(final String fromWho,String message){
+        /**
+         * 收到请求
+         */
+        if(message.equals(RegisterAndRegisterCmd.REQUEST_ADDLOVER_ADD)) {
+
+            /**
+             * 隐藏输入控件
+             */
+            inputLinearLayout.setVisibility(View.GONE);
+
+            title.setText("收到" + fromWho + "的请求");
+            circleProgressBar.setText("确认添加爱人");
+
+            confirm.setClickable(true);
+            confirm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    /**
+                     * 构建请求url
+                     */
+                    String url = ServerConf.SERVER_ADDR + "JianaiServer/AddloverAndgetuserinfoServlet";
+
+                    /**
+                     * 构建url请求参数
+                     */
+                    List<NameValuePair> params = new ArrayList<NameValuePair>();
+                    params.add(new BasicNameValuePair("cmd", RegisterAndRegisterCmd.REQUEST_ADDLOVER_ADD));
+                    params.add(new BasicNameValuePair("info", XMPPUSERNAME + "&&" + fromWho));
+
+                    /**
+                     * 构建handler,在handler中获取并处理结果
+                     */
+                    Handler handler = new Handler() {
+                        @Override
+                        public void handleMessage(final Message msg) {
+                            super.handleMessage(msg);
+                            String result = (String) msg.obj;
+
+                            if(result.equals(RegisterAndRegisterCmd.RESPONSE_LOVERADD_SUCCESS)){
+                                /*添加成功,将成功消息返回给对方*/
+
+                                /**
+                                 * 在openfire中添加好友，对方将默认接受
+                                 */
+                                try {
+                                    XMPPConnectionManager.getInstance().getXmppConnection().getRoster().createEntry(name + "@" + ServerConf.OPENFIRE_SERVER_HOSTNAME, name, null);
+                                } catch (XMPPException e) {
+                                    e.printStackTrace();
+                                }
+
+                                chatManager=XMPPService.chatManager;
+                                chat=chatManager.createChat(fromWho+"@"+ ServerConf.OPENFIRE_SERVER_HOSTNAME, null);
+                                try {
+                                    chat.sendMessage(RegisterAndRegisterCmd.RESPONSE_LOVERADD_SUCCESS);
+                                } catch (XMPPException e) {
+                                    e.printStackTrace();
+                                }
+
+                                title.setText("添加另外一半成功");
+                                circleProgressBar.setText("3秒后将登录");
+                                confirm.setClickable(false);
+
+                                Timer timer=new Timer();
+                                timer.schedule(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        dismiss();
+                                    }
+                                },3000);
+
+                            }else {
+                                /*添加失败，将失败消息返回给对方*/
+
+                                try {
+                                    chat.sendMessage(RegisterAndRegisterCmd.RESPONSE_LOVERADD_FAIL);
+                                } catch (XMPPException e) {
+                                    e.printStackTrace();
+                                }
+
+                                title.setText("添加另外一半失败！");
+                                circleProgressBar.setText("3秒后将退出");
+                                confirm.setClickable(false);
+
+                                Timer timer=new Timer();
+                                timer.schedule(new TimerTask() {
+                                    @Override
+                                    public void run() {
+                                        dismiss();
+                                    }
+                                },3000);
+                            }
+                        }
+                    };
+
+                    /**
+                     * 调用请求方法
+                     */
+                    HttpClientUtil.doPost(url, params, handler);
+
+                    confirm.setClickable(false);
+                }
+            });
+
+        }else if(message.equals(RegisterAndRegisterCmd.RESPONSE_LOVERADD_SUCCESS)){
+            /*被成功添加*/
+            title.setText("添加另外一半成功");
+            circleProgressBar.setText("3秒后将登录");
+            confirm.setClickable(false);
+
+            Timer timer=new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    dismiss();
+                }
+            },3000);
+
+
+        }else if(message.equals(RegisterAndRegisterCmd.RESPONSE_LOVERADD_FAIL)){
+            /*未被成功添加*/
+
+            title.setText("添加另外一半失败！");
+            circleProgressBar.setText("3秒后将退出");
+            confirm.setClickable(false);
+
+            Timer timer=new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    dismiss();
+                }
+            },3000);
+        }
+    }
 
 
 
-
-
-
+    /**********************************以下代码是于service交互的，最好不要修改********************************/
 
     /**
      * 接收消息的信使，在这里调用distributeMessage对消息进行处理
@@ -213,7 +418,7 @@ public class AddLoverDialog {
             /**
              * 用代码注册广播接收者，当NetWorkReceivr得知网络已经连接，立即通知登录XMPP
              */
-            XMPPConnectNetworkReceiver xmppConnectNetworkReceiver=new XMPPConnectNetworkReceiver();
+            xmppConnectNetworkReceiver=new XMPPConnectNetworkReceiver();
             IntentFilter intentFilter=new IntentFilter();
             intentFilter.addAction("com.vibexie.jianai.MainActivityModule.MainActivity.XMPP");
             context.registerReceiver(xmppConnectNetworkReceiver, intentFilter);
@@ -258,15 +463,5 @@ public class AddLoverDialog {
 
             }
         },1000);
-    }
-
-    /**
-     * 对接收到的消息进行处理并进行分发，也就是处理消息的具体实现
-     * @param fromWho
-     * @param message
-     */
-    public void distributeMessage(String fromWho,String message){
-
-
     }
 }

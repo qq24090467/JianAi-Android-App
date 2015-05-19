@@ -1,25 +1,36 @@
 package com.vibexie.jianai.Dao.Bean;
 
 import java.io.InputStream;
+import java.io.Serializable;
 
 /**
  * Created by vibexie on 5/14/15.
  */
-public class UserBean {
+public class UserBean implements Serializable{
     /**
      * 用户id
      */
     private int id;
 
     /**
-     * 爱人id
-     */
-    private int loverId;
-
-    /**
      * 用户名
      */
     private String username;
+
+    /**
+     * 爱人用户名
+     */
+    private String loverName;
+
+    /**
+     * 未加密密码
+     */
+    private String plainPassword;
+
+    /**
+     * 加密密码
+     */
+    private String encryptedPassword;
 
     /**
      * 用户姓名
@@ -71,6 +82,9 @@ public class UserBean {
      */
     private String modificationDate;
 
+    /**
+     * setAndGet方法
+     */
     public int getId() {
         return id;
     }
@@ -79,20 +93,36 @@ public class UserBean {
         this.id = id;
     }
 
-    public int getLoverId() {
-        return loverId;
-    }
-
-    public void setLoverId(int loverId) {
-        this.loverId = loverId;
-    }
-
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getLoverName() {
+        return loverName;
+    }
+
+    public void setLoverName(String loverName) {
+        this.loverName = loverName;
+    }
+
+    public String getPlainPassword() {
+        return plainPassword;
+    }
+
+    public void setPlainPassword(String plainPassword) {
+        this.plainPassword = plainPassword;
+    }
+
+    public String getEncryptedPassword() {
+        return encryptedPassword;
+    }
+
+    public void setEncryptedPassword(String encryptedPassword) {
+        this.encryptedPassword = encryptedPassword;
     }
 
     public String getName() {
