@@ -4,6 +4,8 @@ import android.app.Application;
 import android.test.ApplicationTestCase;
 
 import com.vibexie.jianai.Dao.Bean.UserBean;
+import com.vibexie.jianai.Dao.DBHelper.UserDBHelper;
+import com.vibexie.jianai.Dao.DBManager.DBManager;
 import com.vibexie.jianai.LoginRegister.GetUserInfoFromServer;
 
 /**
@@ -82,11 +84,17 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 //    }
 
     public void test(){
-        GetUserInfoFromServer getUserInfoFromServer=new GetUserInfoFromServer("test1",getContext());
+        GetUserInfoFromServer getUserInfoFromServer=new GetUserInfoFromServer();
 
-        UserBean userBean=getUserInfoFromServer.getMyInfo();
+        UserBean userBean=getUserInfoFromServer.getUserInfo("test1");
 
-        System.out.println("-----------------------"+userBean.getUsername());
+        UserDBHelper helper=new UserDBHelper(getContext(),"100003.db");
+
+        DBManager dbManager=new DBManager(helper);
+
+        dbManager.insertBean("user_info",userBean);
+
+
 
     }
 

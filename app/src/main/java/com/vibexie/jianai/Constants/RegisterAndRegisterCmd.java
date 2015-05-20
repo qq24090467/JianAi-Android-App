@@ -36,16 +36,9 @@ public class RegisterAndRegisterCmd {
     public static final String REQUEST_ADDLOVER_ADD="140";
 
     /**
-     * 请求获取自己信息
+     * 请求获取指定账户信息
      */
-    public static final String REQUEST_MY_INFO="150";
-
-    /**
-     * 请求获取lover信息
-     */
-    public static final String REQUEST_LOVER_INFO="160";
-
-
+    public static final String REQUEST_USER_INFO="150";
 
     /**
      * 服务器返回，成功发送验证码给该邮箱

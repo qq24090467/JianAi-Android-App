@@ -11,7 +11,7 @@ import android.widget.Toast;
  * Created by vibexie on 4/29/15.
  */
 public class UserDBHelper extends SQLiteOpenHelper{
-    private static int DATABASE_VERSION = 2;
+    private static int DATABASE_VERSION = 1;
 
     /**
      * 用户聊天信息表,用户保存用户的聊天记录
@@ -26,7 +26,22 @@ public class UserDBHelper extends SQLiteOpenHelper{
     /**
      * 用户信息表
      */
-    private static String USER_INFO_TABLE_CREATE_SQL= "";
+    private static String USER_INFO_TABLE_CREATE_SQL= "create table user_info(_id integer primary key autoincrement," +
+            "id int(11)," +
+            "username varchar(64)," +
+            "loverName varchar(64)," +
+            "plainPassword varchar(32)," +
+            "encryptedPassword varchar(255)," +
+            "name varchar(100)," +
+            "sex varchar(5)," +
+            "birthday varchar(20)," +
+            "email varchar(100)," +
+            "phone varchar(50)," +
+            "addr varchar(100)," +
+            "sign varchar(100)," +
+            "headimage mediumblob," +
+            "creationDate char(15)," +
+            "modificationDate char(15));";
 
     /**
      * 构造方法
@@ -41,6 +56,7 @@ public class UserDBHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CHAT_MSG_TABLE_CREATE_SQL);
         db.execSQL(SERVER_MSG_TABLE_CREATE_SQL);
+        db.execSQL(USER_INFO_TABLE_CREATE_SQL);
     }
 
     @Override

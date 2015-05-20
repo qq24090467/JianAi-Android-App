@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.vibexie.jianai.Constants.ServerConf;
 import com.vibexie.jianai.Dao.Bean.ChatMsgBean;
 import com.vibexie.jianai.Dao.DBHelper.UserDBHelper;
 import com.vibexie.jianai.Dao.DBManager.DBManager;
@@ -144,10 +145,20 @@ public class ChatActivity extends Activity implements View.OnClickListener,MiniP
      */
     MiniPTRFrame chatMiniPTRFrame;
 
+    /**
+     * lover's name,从MainActivity中获取
+     */
+    private String loverName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        /**
+         * 获取lover用户名
+         */
+        loverName=getIntent().getStringExtra("lovername");
 
         /**
          * 压入到ActivityStack中
@@ -285,9 +296,12 @@ public class ChatActivity extends Activity implements View.OnClickListener,MiniP
         freshDatasManager=new FreshDatasManager<ChatMsgBean>(dbManager.getSqLiteDatabase(),new ChatMsgBean(),"friend_msg",20);
 
         /**
-         * 获取表中的第一组数据，之后就下拉刷新
+         * 获取表中的第一组数据，之后就下拉刷新,这里的判断是可能没有数据，这样会造成控指针异常
          */
-        msgs.addAll(0, freshDatasManager.getRefreshBeans());
+        ArrayList<ChatMsgBean> tmpRefreshBeans;
+        if((tmpRefreshBeans=freshDatasManager.getRefreshBeans())!=null){
+            msgs.addAll(0, tmpRefreshBeans);
+        }
 
         listViewAdapter = new ListViewAdapter(this, msgs);
         listView.setAdapter(listViewAdapter);
@@ -689,7 +703,7 @@ public class ChatActivity extends Activity implements View.OnClickListener,MiniP
         chatMsgBean.setFromOrTo(1);
         chatMsgBean.setRead(0);
 
-        Chat chat=chatManager.createChat("yyyy@vibexie-workstation", null);
+        Chat chat=chatManager.createChat(loverName+"@"+ ServerConf.OPENFIRE_SERVER_HOSTNAME, null);
         if(dbManager.insertBean("friend_msg",chatMsgBean)){
             /*插入数据库成功才发送消息给对方*/
 

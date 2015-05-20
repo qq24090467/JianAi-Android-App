@@ -2,7 +2,9 @@ package com.vibexie.jianai.LoginRegister;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +15,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.vibexie.jianai.Dao.Bean.UserBean;
+import com.vibexie.jianai.Dao.DBHelper.UserDBHelper;
+import com.vibexie.jianai.Dao.DBManager.DBManager;
 import com.vibexie.jianai.Utils.ActivityStackManager;
 import com.vibexie.jianai.Constants.RegisterAndRegisterCmd;
 import com.vibexie.jianai.Constants.ServerConf;
@@ -26,8 +30,12 @@ import com.vibexie.jianai.Utils.NetworkStateUtil;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *  Created by vibexie on 3/7/15
@@ -53,6 +61,16 @@ public class LoginActivity extends Activity {
     private String username;
     private String password;
 
+    private final String LOGIN_PREFERENCES_NAME="login_preferences";
+
+
+    /**
+     * 对用户保存的密码和自动登录选项进行处理
+     */
+    SharedPreferences loginPreferences;
+    SharedPreferences.Editor editor;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,18 +85,44 @@ public class LoginActivity extends Activity {
 
         initClickListener();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                GetUserInfoFromServer getUserInfoFromServer=new GetUserInfoFromServer("admin",LoginActivity.this);
+        initSharedPreferences();
 
-                UserBean userBean=getUserInfoFromServer.getMyInfo();
+        if(loginPreferences.contains("username")){
+            usernameEditText.setText(loginPreferences.getString("username",null));
 
-                Toast.makeText(LoginActivity.this,userBean.getEmail(),Toast.LENGTH_SHORT).show();
+            /**
+             * 对密码进行解密
+             */
+            passwordEditText.setText(new BlowfishUtil(ServerConf.PASSWORD_KEY).decryptString(loginPreferences.getString("password", null)));
+            remenberCheckBox.setChecked(true);
+
+            if(loginPreferences.contains("antologin") && loginPreferences.getBoolean("antologin",false)==true){
+
+                autologinCheckBox.setChecked(true);
+
+                if(NetworkStateUtil.isNetWorkConnected(LoginActivity.this)){
+                    /*网络连接上的话，向服务器请求新的数据，因为可能数据发生了改变*/
+
+                    /**
+                     * 自动调用登录操作
+                     */
+                    loginButton.callOnClick();
+
+                }else {
+                    /*无法联网的情况下，携带保存的用户名，密码，用户id跳转到MainActivity*/
+
+                    /**
+                     * 切换到MainActivity，并finish本activity，这里同时还要携带自己的用户名和密码，用户id及lover用户名过去
+                     */
+                    Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+                    intent.putExtra("username",usernameEditText.getText().toString());
+                    intent.putExtra("password",passwordEditText.getText().toString());
+                    intent.putExtra("userid",loginPreferences.getInt("userid",0));
+                    startActivity(intent);
+                    finish();
+                }
             }
-        }).start();
-
-
+        }
     }
 
 
@@ -98,7 +142,7 @@ public class LoginActivity extends Activity {
         passwordEditText = (EditText) this.findViewById(R.id.password);
         loginButton = (Button) this.findViewById(R.id.login);
         registerBubtton = (Button) this.findViewById(R.id.register);
-        remenberCheckBox = (CheckBox) this.findViewById(R.id.remenber);
+        remenberCheckBox = (CheckBox) this.findViewById(R.id.remember);
         autologinCheckBox = (CheckBox) this.findViewById(R.id.autologin);
 
         progressDialog=new ProgressDialog(this);
@@ -119,16 +163,16 @@ public class LoginActivity extends Activity {
             @Override
             public void onClick(View view) {
 
-                if(!isAllEditTextEdited()){
+                if (!isAllEditTextEdited()) {
                     /*用户名和密码未输入，直接返回*/
 
                     return;
                 }
 
-                if(!NetworkStateUtil.isNetWorkConnected(getApplicationContext())){
+                if (!NetworkStateUtil.isNetWorkConnected(getApplicationContext())) {
                     /*网络未连接,提示用户设置网络*/
 
-                    NetworkSettingsAlertDialog networkSettingsAlertDialog=new NetworkSettingsAlertDialog(LoginActivity.this);
+                    NetworkSettingsAlertDialog networkSettingsAlertDialog = new NetworkSettingsAlertDialog(LoginActivity.this);
                     networkSettingsAlertDialog.show();
 
                     /*返回，不进行请求*/
@@ -152,7 +196,7 @@ public class LoginActivity extends Activity {
                 params.add(new BasicNameValuePair("password", new BlowfishUtil(ServerConf.PASSWORD_KEY).encryptString(password)));
 
                 /*处理请求结果*/
-                Handler handler=new Handler(){
+                Handler handler = new Handler() {
                     @Override
                     public void handleMessage(Message msg) {
                         super.handleMessage(msg);
@@ -160,35 +204,27 @@ public class LoginActivity extends Activity {
                         /**
                          * 请求结果
                          */
-                        String result=msg.obj.toString();
+                        String result = msg.obj.toString();
 
-                        if(result.equals("refused")){
+                        if (result.equals("refused")) {
                                     /*请求超时或服务器关闭*/
                             progressDialog.dismiss();
                             Toast.makeText(LoginActivity.this, "请求超时或服务器关闭", Toast.LENGTH_SHORT).show();
 
-                        }else if(result.equals(RegisterAndRegisterCmd.RESPONSE_LOGIN_SUCCESS)){
+                        } else if (result.equals(RegisterAndRegisterCmd.RESPONSE_LOGIN_SUCCESS)) {
                             /*登录成功*/
 
                             progressDialog.dismiss();
 
-                            AddLoverDialog addLoverDialog=new AddLoverDialog(LoginActivity.this,username,password);
-                            addLoverDialog.show();
+                            workWhenLoginSucceed();
 
-//                            /**
-//                             * 切换到MainActivity，并finish本activity
-//                             */
-//                            Intent intent=new Intent(LoginActivity.this,MainActivity.class);
-//                            startActivity(intent);
-//                            finish();
-
-                        }else if(result.equals(RegisterAndRegisterCmd.RESPONSE_LOGIN_PASSWORD_WRONG)){
+                        } else if (result.equals(RegisterAndRegisterCmd.RESPONSE_LOGIN_PASSWORD_WRONG)) {
                             /*密码错误*/
 
                             progressDialog.dismiss();
                             Toast.makeText(LoginActivity.this, "密码错误", Toast.LENGTH_SHORT).show();
 
-                        }else if(result.equals(RegisterAndRegisterCmd.RESPONSE_LOGIN_USER_NOT_EXIST)){
+                        } else if (result.equals(RegisterAndRegisterCmd.RESPONSE_LOGIN_USER_NOT_EXIST)) {
                             /*用户不存在*/
 
                             progressDialog.dismiss();
@@ -211,11 +247,33 @@ public class LoginActivity extends Activity {
         registerBubtton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent registerIntent=new Intent(LoginActivity.this,RegisterForVerifyingCodeActivity.class);
+                Intent registerIntent = new Intent(LoginActivity.this, RegisterForVerifyingCodeActivity.class);
                 startActivity(registerIntent);
             }
         });
     }
+
+
+    /**
+     * 初始化
+     */
+    private void initSharedPreferences(){
+        loginPreferences=getSharedPreferences(LOGIN_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        editor=loginPreferences.edit();
+
+        /**
+         * 第一次启动App,创建Preferences文件
+         */
+        File file=new File("/data/data/"+getPackageName().toString()+"/shared_prefs",LOGIN_PREFERENCES_NAME+".xml");
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     /**
      * 判断用户名和密码是否已经输入
@@ -236,5 +294,145 @@ public class LoginActivity extends Activity {
         }
 
         return true;
+    }
+
+
+    /**
+     * 成功登录后的一些处理，如添加lover,获取自己和lover信息，跳转到MainActivity
+     */
+    private void workWhenLoginSucceed(){
+
+        final Handler handler=new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+                if(msg.arg1==1){
+                    /*对自己及lover信息进行操作*/
+
+                    ArrayList<UserBean> userBeans=(ArrayList<UserBean>)msg.obj;
+
+                    UserBean myBean=userBeans.get(0);
+                    UserBean loverBean=userBeans.get(1);
+
+                    /**
+                     * 数据库名已用户id+.db的形式进行命名
+                     */
+                    UserDBHelper helper=new UserDBHelper(LoginActivity.this,myBean.getId()+".db");
+
+                    DBManager dbManager=new DBManager(helper);
+
+                    /**
+                     * 对自己的信息进行操作
+                     */
+                    if(dbManager.getBeans(new UserBean(),"user_info","username=?",new String[]{myBean.getUsername()}).size()==0){
+                        /*不存在则插入*/
+
+                        dbManager.insertBean("user_info",myBean);
+                    }else {
+                        /*存在则更新*/
+
+                        dbManager.updateBean(myBean,"user_info","username=?",new String[]{myBean.getUsername()});
+                    }
+
+                    /**
+                     * 对lover的信息进行操作
+                     */
+                    if(dbManager.getBeans(new UserBean(),"user_info","username=?",new String[]{loverBean.getUsername()}).size()==0){
+                        /*不存在则插入*/
+
+                        dbManager.insertBean("user_info", loverBean);
+
+                    }else {
+                        /*存在则更新*/
+
+                        dbManager.updateBean(loverBean,"user_info","username=?",new String[]{loverBean.getUsername()});
+                    }
+
+                    dbManager.close();
+
+                    /**
+                     * 将用户名和密码,用户id,lover用户名及是否自动登录添加到loginPreference中
+                     */
+                    if(remenberCheckBox.isChecked()){
+                        editor.clear();
+                        editor.commit();
+
+                        editor.putString("username",username);
+
+                        /**
+                         * 对密码进行加密保存
+                         */
+                        editor.putString("password",new BlowfishUtil(ServerConf.PASSWORD_KEY).encryptString(password));
+                        editor.commit();
+                    }
+
+                    if(autologinCheckBox.isChecked()){
+                        editor.clear();
+                        editor.commit();
+
+                        editor.putString("username",username);
+
+                        /**
+                         * 对密码进行加密保存
+                         */
+                        editor.putString("password",new BlowfishUtil(ServerConf.PASSWORD_KEY).encryptString(password));
+                        editor.putInt("userid",myBean.getId());
+                        editor.putBoolean("antologin",true);
+                        editor.commit();
+                    }
+
+                    /**
+                     * 切换到MainActivity，并finish本activity，这里同时还要携带自己的用户名和密码及id过去
+                     */
+                    Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+                    intent.putExtra("username",myBean.getUsername());
+                    intent.putExtra("password",password);
+                    intent.putExtra("userid",myBean.getId());
+                    startActivity(intent);
+                    finish();
+
+                }else if(msg.arg1==2){
+                    /**
+                     * 进行添加lover操作
+                     */
+                    AddLoverDialog addLoverDialog = new AddLoverDialog(LoginActivity.this, username, password);
+                    addLoverDialog.show();
+                }
+            }
+        };
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                GetUserInfoFromServer getUserInfoFromServer=new GetUserInfoFromServer();
+
+                Message message=Message.obtain();
+
+                if(getUserInfoFromServer.isLoverAdded(username)){
+                    /*已添加lover*/
+
+                    message.arg1=1;
+
+                    /**
+                     * 获取自己及lover信息
+                     */
+                    ArrayList<UserBean> userBeans=new ArrayList<UserBean>();
+                    UserBean myBean=getUserInfoFromServer.getUserInfo(username);
+                    UserBean loverBean=getUserInfoFromServer.getUserInfo(myBean.getLoverName());
+                    userBeans.add(myBean);
+                    userBeans.add(loverBean);
+
+                    message.obj=userBeans;
+
+                }else {
+                    /*未添加lover*/
+
+                    message.arg1 = 2;
+                }
+
+                handler.sendMessage(message);
+            }
+        }).start();
     }
 }

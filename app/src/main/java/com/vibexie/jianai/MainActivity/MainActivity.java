@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.vibexie.jianai.Chat.ChatActivity;
 import com.vibexie.jianai.Dao.Bean.ChatMsgBean;
+import com.vibexie.jianai.Dao.Bean.UserBean;
 import com.vibexie.jianai.Dao.DBHelper.UserDBHelper;
 import com.vibexie.jianai.Dao.DBManager.DBManager;
 import com.vibexie.jianai.Services.XMPPservice.XMPPService;
@@ -43,22 +44,30 @@ public class MainActivity extends Activity{
 
     private ImageButton chatImageButton;
 
-    /*以下3个参数在sqlite中获取*/
-
     /**
      * XMPP用户名
      */
-    private static final String XMPPUSERNAME="test2";
+    private static String XMPPUSERNAME;
 
     /**
      * XMPP用户密码
      */
-    private static final String XMPPPASSWORD="test2";
+    private static String XMPPPASSWORD;
 
     /**
-     * XMPP lover的用户名
+     * 我的id,这里从LoginActivity中传进来是未了操作数据库，否则没法得知数据库的名字
      */
-    private static final String XMPPLOVERNAME="admin";
+    private static int USERID;
+
+    /**
+     * 我的bean
+     */
+    private static UserBean myBean;
+
+    /**
+     * lover's bean
+     */
+    private static UserBean loverBean;
 
     /**
      * 标记XMPPConnectNetworkReceiver只注册一次
@@ -76,9 +85,14 @@ public class MainActivity extends Activity{
         ActivityStackManager.getInstance().push(this);
 
         /**
+         * 初始化用户及lover信息,这里一步要在其它初始化前面
+         */
+        initMyAndLoverInfo();
+
+        /**
          * 初始化XMPP服务
          */
-        initService(XMPPUSERNAME,XMPPPASSWORD);
+        initService(XMPPUSERNAME, XMPPPASSWORD);
 
         chatImageButton=(ImageButton)this.findViewById(R.id.chat);
 
@@ -86,6 +100,7 @@ public class MainActivity extends Activity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                intent.putExtra("lovername",loverBean.getUsername());
                 startActivity(intent);
             }
         });
@@ -105,6 +120,27 @@ public class MainActivity extends Activity{
          * 解除绑定XMPPService
          */
         unbindService(serviceConnection);
+    }
+
+    /**
+     * 初始化用户及lover信息
+     */
+    private void initMyAndLoverInfo(){
+        /**
+         * 从LoginActivity中获取参数
+         */
+        Intent receiveIntent=getIntent();
+        XMPPUSERNAME=receiveIntent.getStringExtra("username");
+        XMPPPASSWORD=receiveIntent.getStringExtra("password");
+        USERID=receiveIntent.getIntExtra("userid",0);
+
+        UserDBHelper dbHelper=new UserDBHelper(MainActivity.this,USERID+".db");
+        DBManager dbManager=new DBManager(dbHelper);
+
+        myBean=(dbManager.getBeans(new UserBean(),"user_info","username=?",new String[]{XMPPUSERNAME})).get(0);
+        loverBean=(dbManager.getBeans(new UserBean(),"user_info","username=?",new String[]{myBean.getLoverName()})).get(0);
+
+        dbManager.close();
     }
 
     /*************************************************************************************************/
@@ -127,6 +163,7 @@ public class MainActivity extends Activity{
                 String message=jsonObject.getString("msg");
 
                 distributeMessage(fromWho,message);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -235,7 +272,7 @@ public class MainActivity extends Activity{
         /**
          * 收到lover的消息
          */
-        if(fromWho.equals(XMPPLOVERNAME)){
+        if(fromWho.equals(loverBean.getUsername())){
             ChatMsgBean chatMsgBean=new ChatMsgBean();
             chatMsgBean.setMsgTime(TimeUtil.getCurrentStandardTime());
             chatMsgBean.setMsgContent(message);
@@ -247,7 +284,7 @@ public class MainActivity extends Activity{
              */
             int _id=0;
 
-            UserDBHelper userDBHelper=new UserDBHelper(MainActivity.this,"100002.db");
+            UserDBHelper userDBHelper=new UserDBHelper(MainActivity.this,USERID+".db");
             DBManager dbManager=new DBManager(userDBHelper);
 
             if(dbManager.insertBean("friend_msg",chatMsgBean)){

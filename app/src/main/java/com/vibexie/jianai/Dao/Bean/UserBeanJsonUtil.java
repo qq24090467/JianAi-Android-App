@@ -13,17 +13,17 @@ public class UserBeanJsonUtil {
 
         try {
             jsonObject.put("id", userBean.getId());
-            jsonObject.put("username",userBean.getUsername());
-            jsonObject.put("loverName",userBean.getLoverName());
-            jsonObject.put("name",userBean.getName());
-            jsonObject.put("sex",userBean.getSex());
-            jsonObject.put("birthday",userBean.getBirthday());
-            jsonObject.put("email",userBean.getEmail());
-            jsonObject.put("phone",userBean.getPhone());
-            jsonObject.put("addr",userBean.getAddr());
-            jsonObject.put("sign",userBean.getSign());
-            jsonObject.put("creationDate",userBean.getCreationDate());
-            jsonObject.put("modificationDate",userBean.getModificationDate());
+            jsonObject.put("username",userBean.getUsername()==null?"":userBean.getUsername());
+            jsonObject.put("loverName",userBean.getLoverName()==null?"":userBean.getLoverName());
+            jsonObject.put("name",userBean.getName()==null?"":userBean.getName());
+            jsonObject.put("sex",userBean.getSex()==null?"":userBean.getSex());
+            jsonObject.put("birthday",userBean.getBirthday()==null?"":userBean.getBirthday());
+            jsonObject.put("email",userBean.getEmail()==null?"":userBean.getEmail());
+            jsonObject.put("phone",userBean.getPhone()==null?"":userBean.getPhone());
+            jsonObject.put("addr",userBean.getAddr()==null?"":userBean.getAddr());
+            jsonObject.put("sign",userBean.getSign()==null?"":userBean.getSign());
+            jsonObject.put("creationDate",userBean.getCreationDate()==null?"":userBean.getCreationDate());
+            jsonObject.put("modificationDate",userBean.getModificationDate()==null?"":userBean.getModificationDate());
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -36,17 +36,17 @@ public class UserBeanJsonUtil {
 
         try {
             userBean.setId(jsonObject.getInt("id"));
-            userBean.setUsername(jsonObject.getString("username"));
-            //userBean.setLoverName(jsonObject.getString("loverName"));
-            userBean.setName(jsonObject.getString("name"));
-            userBean.setSex(jsonObject.getString("sex"));
-            userBean.setBirthday(jsonObject.getString("birthday"));
-            userBean.setEmail(jsonObject.getString("email"));
-            userBean.setPhone(jsonObject.getString("phone"));
-            userBean.setAddr(jsonObject.getString("addr"));
-            //userBean.setSign(jsonObject.getString("sign"));
-            userBean.setCreationDate(jsonObject.getString("creationDate"));
-            //userBean.setModificationDate(jsonObject.getString("modificationDate"));
+            userBean.setUsername(jsonObject.getString("username").equals("") ? null : jsonObject.getString("username"));
+            userBean.setLoverName(jsonObject.getString("loverName").equals("") ?null : jsonObject.getString("loverName"));
+            userBean.setName(jsonObject.getString("name").equals("") ? null : jsonObject.getString("name"));
+            userBean.setSex(jsonObject.getString("sex").equals("") ? null : jsonObject.getString("sex"));
+            userBean.setBirthday(jsonObject.getString("birthday").equals("") ? null : jsonObject.getString("birthday"));
+            userBean.setEmail(jsonObject.getString("email").equals("") ? null : jsonObject.getString("email"));
+            userBean.setPhone(jsonObject.getString("phone").equals("") ? null : jsonObject.getString("phone"));
+            userBean.setAddr(jsonObject.getString("addr").equals("") ? null : jsonObject.getString("addr"));
+            userBean.setSign(jsonObject.getString("sign").equals("") ? null : jsonObject.getString("sign"));
+            userBean.setCreationDate(jsonObject.getString("creationDate").equals("") ? null : jsonObject.getString("creationDate"));
+            userBean.setModificationDate(jsonObject.getString("modificationDate").equals("") ? null : jsonObject.getString("modificationDate"));
 
         } catch (JSONException e) {
             e.printStackTrace();

@@ -189,7 +189,7 @@
                     android:layout_height="match_parent"
                     android:text="记住密码"
                     android:textColor="#3B3B3B"
-                    android:id="@+id/remenber"/>
+                    android:id="@+id/remember"/>
             </LinearLayout>
 
             <LinearLayout
@@ -202,8 +202,7 @@
                     android:layout_height="match_parent"
                     android:text="自动登录"
                     android:textColor="#3B3B3B"
-                    android:id="@+id/autologin"
-                    />
+                    android:id="@+id/autologin" />
             </LinearLayout>
 
         </LinearLayout>

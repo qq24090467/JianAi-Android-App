@@ -16,14 +16,12 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 /**
@@ -31,33 +29,50 @@ import java.util.Map;
  */
 public class GetUserInfoFromServer {
 
-    private String username;
-    Context context;
+    Map<String,String> map=new HashMap<String,String>();
 
-    public GetUserInfoFromServer(String username,Context context){
-        this.username=username;
-        this.context=context;
+    public GetUserInfoFromServer(){
+
     }
 
-    public boolean isLoverAdded(){
+    /**
+     * 判断是否添加了lover
+     * @return
+     */
+    public boolean isLoverAdded(String username){
         boolean flag=false;
 
-        Map<String,String> map=new HashMap<String,String>();
-
-        map.put("username",username);
+        map.clear();
+        map.put("cmd", RegisterAndRegisterCmd.REQUEST_USER_INFO);
         map.put("url", ServerConf.SERVER_ADDR + "JianaiServer/AddloverAndgetuserinfoServlet");
 
-        //HttpURLConnectionUtil.doPost(map);
+        if(map.containsKey("username")){
+            map.remove("username");
+        }
+
+        map.put("username",username);
+
+        if(getUserBean(map,"POST").getLoverName()!=null){
+            flag=true;
+        }
 
         return flag;
     }
 
-    public UserBean getMyInfo(){
-        Map<String,String> map=new HashMap<String,String>();
-
-        map.put("cmd", RegisterAndRegisterCmd.REQUEST_MY_INFO);
-        map.put("username",username);
+    /**
+     * 返回用户的信息
+     * @return
+     */
+    public UserBean getUserInfo(String username){
+        map.clear();
+        map.put("cmd", RegisterAndRegisterCmd.REQUEST_USER_INFO);
         map.put("url", ServerConf.SERVER_ADDR + "JianaiServer/AddloverAndgetuserinfoServlet");
+
+        if(map.containsKey("username")){
+            map.remove("username");
+        }
+
+        map.put("username",username);
 
         return getUserBean(map, "POST");
     }

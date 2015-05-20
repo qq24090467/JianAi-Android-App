@@ -257,7 +257,7 @@ public class AddLoverDialog {
                                  * 在openfire中添加好友，对方将默认接受
                                  */
                                 try {
-                                    XMPPConnectionManager.getInstance().getXmppConnection().getRoster().createEntry(name + "@" + ServerConf.OPENFIRE_SERVER_HOSTNAME, name, null);
+                                    XMPPConnectionManager.getInstance().getXmppConnection().getRoster().createEntry(fromWho + "@" + ServerConf.OPENFIRE_SERVER_HOSTNAME, fromWho, null);
                                 } catch (XMPPException e) {
                                     e.printStackTrace();
                                 }
