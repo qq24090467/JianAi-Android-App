@@ -16,6 +16,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vibexie.jianai.Chat.ChatActivity;
@@ -27,6 +28,7 @@ import com.vibexie.jianai.Services.XMPPservice.XMPPService;
 import com.vibexie.jianai.Utils.ActivityStackManager;
 
 import com.vibexie.jianai.R;
+import com.vibexie.jianai.Utils.RoundImageView;
 import com.vibexie.jianai.Utils.TimeUtil;
 
 import org.json.JSONException;
@@ -47,17 +49,17 @@ public class MainActivity extends Activity{
     /**
      * XMPP用户名
      */
-    private static String XMPPUSERNAME;
+    public static String XMPPUSERNAME;
 
     /**
      * XMPP用户密码
      */
-    private static String XMPPPASSWORD;
+    public static String XMPPPASSWORD;
 
     /**
      * 我的id,这里从LoginActivity中传进来是未了操作数据库，否则没法得知数据库的名字
      */
-    private static int USERID;
+    public static int USERID;
 
     /**
      * 我的bean
@@ -74,6 +76,19 @@ public class MainActivity extends Activity{
      */
     private static boolean isXMPPConnectNetworkReceiverRegistered=false;
 
+    /**
+     * sliding_left布局的相关控件
+     */
+    private RoundImageView sliding_left_my_head;
+    private TextView sliding_left_my_name;
+    private TextView sliding_left_my_username;
+    private TextView sliding_left_my_sign;
+    private RoundImageView sliding_left_lover_head;
+    private TextView sliding_left_lover_name;
+    private TextView sliding_left_lover_username;
+    private TextView sliding_left_lover_sign;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +98,8 @@ public class MainActivity extends Activity{
          * 压入到ActivityStack中
          */
         ActivityStackManager.getInstance().push(this);
+
+        initWeidgts();
 
         /**
          * 初始化用户及lover信息,这里一步要在其它初始化前面
@@ -141,6 +158,27 @@ public class MainActivity extends Activity{
         loverBean=(dbManager.getBeans(new UserBean(),"user_info","username=?",new String[]{myBean.getLoverName()})).get(0);
 
         dbManager.close();
+
+        if(myBean.getSex()!=null && myBean.equals("女")){
+
+        }
+    }
+
+    /**
+     * 初始化控件
+     */
+    public void initWeidgts(){
+        /**
+         * sliding_left布局的相关控件
+         */
+        sliding_left_my_head=(RoundImageView)this.findViewById(R.id.sliding_left_my_head);
+        sliding_left_my_name=(TextView)this.findViewById(R.id.sliding_left_my_name);
+        sliding_left_my_username=(TextView)this.findViewById(R.id.sliding_left_my_username);
+        sliding_left_my_sign=(TextView)this.findViewById(R.id.sliding_left_my_sign);
+        sliding_left_lover_head=(RoundImageView)this.findViewById(R.id.sliding_left_lover_head);
+        sliding_left_lover_name=(TextView)this.findViewById(R.id.sliding_left_lover_name);
+        sliding_left_lover_username=(TextView)this.findViewById(R.id.sliding_left_lover_username);
+        sliding_left_lover_sign=(TextView)this.findViewById(R.id.sliding_left_lover_sign);
     }
 
     /*************************************************************************************************/

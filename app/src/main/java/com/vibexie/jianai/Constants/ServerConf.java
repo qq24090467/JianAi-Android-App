@@ -9,7 +9,7 @@ public class ServerConf {
     /**
      * 服务器对用户密码加密的密钥，这个值在第一次发布APP的时候一旦设定，后续版本必须不能改变这个值
      */
-    public  static String PASSWORD_KEY="vrFc60b8mKe83cM";
+    public  static String PASSWORD_KEY="D1uwM9YESNiEW5W";
 
     /**
      * openfire服务器IP地址，使用openfire默认端口5222

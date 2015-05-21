@@ -23,15 +23,19 @@ import android.widget.Toast;
 
 import com.vibexie.jianai.Constants.RegisterAndRegisterCmd;
 import com.vibexie.jianai.Constants.ServerConf;
+import com.vibexie.jianai.Dao.Bean.UserBean;
 import com.vibexie.jianai.R;
 import com.vibexie.jianai.Services.XMPPservice.XMPPConnectionManager;
 import com.vibexie.jianai.Services.XMPPservice.XMPPService;
+import com.vibexie.jianai.Utils.BlowfishUtils.BlowfishUtil;
 import com.vibexie.jianai.Utils.HttpClientUtil;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -197,6 +201,13 @@ public class AddLoverDialog {
             }
 
             /**
+             * 下线
+             */
+            if(XMPPConnectionManager.getInstance().getXmppConnection().isConnected()){
+                XMPPConnectionManager.getInstance().disconnect();
+            }
+
+            /**
              * 解绑service
              */
             context.unbindService(serviceConnection);
@@ -257,10 +268,15 @@ public class AddLoverDialog {
                                  * 在openfire中添加好友，对方将默认接受
                                  */
                                 try {
-                                    XMPPConnectionManager.getInstance().getXmppConnection().getRoster().createEntry(fromWho + "@" + ServerConf.OPENFIRE_SERVER_HOSTNAME, fromWho, null);
+                                    XMPPConnectionManager.getInstance().getXmppConnection().getRoster().createEntry(fromWho + "@" + ServerConf.OPENFIRE_SERVER_HOSTNAME, fromWho, new String[]{"Lover"});
                                 } catch (XMPPException e) {
                                     e.printStackTrace();
                                 }
+
+                                /**
+                                 * 对方添加自己为好友
+                                 */
+                                loverAddMe(fromWho);
 
                                 chatManager=XMPPService.chatManager;
                                 chat=chatManager.createChat(fromWho+"@"+ ServerConf.OPENFIRE_SERVER_HOSTNAME, null);
@@ -347,7 +363,55 @@ public class AddLoverDialog {
         }
     }
 
+    /**
+     * 让对方添加自己
+     * @param username
+     */
+    public void loverAddMe(final String username){
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                /**
+                 * 连接配置
+                 */
+                ConnectionConfiguration connectionConfiguration = new ConnectionConfiguration(ServerConf.OPENFIRE_SERVER_IP, 5222, ServerConf.OPENFIRE_SERVER_HOSTNAME);
+                connectionConfiguration.setReconnectionAllowed(true);
+                connectionConfiguration.setSendPresence(true);
+
+                /**
+                 * 建立XMPP连接
+                 */
+                XMPPConnection xmppConnection = new XMPPConnection(connectionConfiguration);
+                try {
+                    xmppConnection.connect();
+
+                    GetUserInfoFromServer getUserInfoFromServer=new GetUserInfoFromServer();
+
+                    UserBean loverBean=getUserInfoFromServer.getUserInfo(username);
+
+                    /**
+                     * 登录
+                     */
+                    xmppConnection.login(loverBean.getUsername(), new BlowfishUtil(ServerConf.PASSWORD_KEY).decryptString(loverBean.getEncryptedPassword()));
+
+                    /**
+                     * 让对方添加自己
+                     */
+                    xmppConnection.getRoster().createEntry(loverBean.getLoverName() + "@" + ServerConf.OPENFIRE_SERVER_HOSTNAME, loverBean.getLoverName(), new String[]{"Lover"});
+
+                    /**
+                     * 断开连接
+                     */
+                    xmppConnection.disconnect();
+
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+    }
 
     /**********************************以下代码是于service交互的，最好不要修改********************************/
 

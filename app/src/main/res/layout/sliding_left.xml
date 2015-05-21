@@ -43,7 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/sliding_left_my_head"
-                    android:src="@drawable/main_activity_my_default_head"
+                    android:src="@drawable/main_activity_woman_default_head"
                     roundImage:type="circle"/>
 
             </LinearLayout>
@@ -62,16 +62,47 @@
                     android:gravity="center_vertical"
                     android:textSize="15sp"
                     android:textColor="#ffffff"
-                    android:text="VibeXie"/>
+                    android:id="@+id/sliding_left_my_name"
+                    android:text="你的姓名"/>
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:textSize="15sp"
-                    android:textColor="#ffffff"
-                    android:text="简爱号:VibeXie"/>
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="15sp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:textColor="#ffffff"
+                        android:text="简爱号:"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="15sp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:textColor="#ffffff"
+                        android:id="@+id/sliding_left_my_username"
+                        android:text="你的简爱号"/>
+
+
+                </LinearLayout>
+
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="0dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:textSize="15sp"-->
+                    <!--android:textColor="#ffffff"-->
+                    <!--android:id="@+id/sliding_left_my_username"-->
+                    <!--android:text="简爱号:VibeXie"/>-->
 
             </LinearLayout>
 
@@ -90,7 +121,8 @@
                 android:layout_marginLeft="10dp"
                 android:textColor="#ffffff"
                 android:textSize="15dp"
-                android:text="“我爱你，一辈子”"/>
+                android:id="@+id/sliding_left_my_sign"
+                android:text="“请填写你的爱情宣言”"/>
 
         </LinearLayout>
 
@@ -124,7 +156,8 @@
                 <com.vibexie.jianai.Utils.RoundImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/main_activity_lover_default_head"
+                    android:id="@+id/sliding_left_lover_head"
+                    android:src="@drawable/main_activity_man_default_head"
                     roundImage:type="circle"/>
 
             </LinearLayout>
@@ -143,16 +176,45 @@
                     android:textSize="15sp"
                     android:textColor="#ffffff"
                     android:gravity="center_vertical"
-                    android:text="VibeXie"/>
+                    android:id="@+id/sliding_left_lover_name"
+                    android:text="恋人的姓名"/>
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:textSize="15sp"
-                    android:textColor="#ffffff"
                     android:gravity="center_vertical"
-                    android:text="简爱号:VibeXie"/>
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="15sp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:textColor="#ffffff"
+                        android:text="简爱号:"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="15sp"
+                        android:layout_gravity="center_vertical"
+                        android:gravity="center_vertical"
+                        android:textColor="#ffffff"
+                        android:id="@+id/sliding_left_lover_username"
+                        android:text="恋人的简爱号"/>
+
+
+                </LinearLayout>
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="0dp"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:textSize="15sp"-->
+                    <!--android:textColor="#ffffff"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:text="简爱号:VibeXie"/>-->
 
             </LinearLayout>
 
@@ -171,7 +233,8 @@
                 android:layout_marginLeft="10dp"
                 android:textColor="#ffffff"
                 android:textSize="15dp"
-                android:text="“我爱你，一辈子”"/>
+                android:id="@+id/sliding_left_lover_sign"
+                android:text="“恋人的爱情宣言未填写”"/>
 
         </LinearLayout>
 

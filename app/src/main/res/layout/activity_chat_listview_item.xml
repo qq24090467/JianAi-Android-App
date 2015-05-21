@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:roundImage="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#ffffff">
@@ -28,11 +29,17 @@
             android:orientation="horizontal"
             android:visibility="visible">
 
-            <ImageView
-                android:id="@+id/friend_head"
+            <!--<ImageView-->
+                <!--android:id="@+id/friend_head"-->
+                <!--android:layout_width="40dp"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:src="@drawable/chat_activity_friend_head"/>-->
+
+            <com.vibexie.jianai.Utils.RoundImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/chat_activity_friend_head"/>
+                android:src="@drawable/main_activity_woman_default_head"
+                roundImage:type="circle"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -52,12 +59,20 @@
             android:layout_alignParentRight="true"
             android:id="@+id/layout_from_me">
 
-            <ImageView
+            <!--<ImageView-->
+                <!--android:layout_width="40dp"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:id="@+id/my_head"-->
+                <!--android:src="@drawable/chat_activity_my_head"-->
+                <!--android:layout_alignParentRight="true"/>-->
+
+            <com.vibexie.jianai.Utils.RoundImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:id="@+id/my_head"
-                android:src="@drawable/chat_activity_my_head"
-                android:layout_alignParentRight="true"/>
+                android:src="@drawable/main_activity_man_default_head"
+                android:layout_alignParentRight="true"
+                roundImage:type="circle"/>
 
             <TextView
                 android:id="@+id/msg_content_from_me"

@@ -33,6 +33,7 @@ import com.vibexie.jianai.Constants.ServerConf;
 import com.vibexie.jianai.Dao.Bean.ChatMsgBean;
 import com.vibexie.jianai.Dao.DBHelper.UserDBHelper;
 import com.vibexie.jianai.Dao.DBManager.DBManager;
+import com.vibexie.jianai.MainActivity.MainActivity;
 import com.vibexie.jianai.MiniPTR.MiniPTRFrame;
 import com.vibexie.jianai.MiniPTR.MiniPTROnRefreshListener;
 import com.vibexie.jianai.Services.XMPPservice.XMPPService;
@@ -291,7 +292,7 @@ public class ChatActivity extends Activity implements View.OnClickListener,MiniP
      */
     private void initMsgAndMsgListener(){
 
-        userDBHelper=new UserDBHelper(getApplicationContext(),"100002.db");
+        userDBHelper=new UserDBHelper(getApplicationContext(), MainActivity.USERID+".db");
         dbManager=new DBManager(userDBHelper);
         freshDatasManager=new FreshDatasManager<ChatMsgBean>(dbManager.getSqLiteDatabase(),new ChatMsgBean(),"friend_msg",20);
 

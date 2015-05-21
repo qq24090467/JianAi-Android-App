@@ -15,6 +15,7 @@ public class UserBeanJsonUtil {
             jsonObject.put("id", userBean.getId());
             jsonObject.put("username",userBean.getUsername()==null?"":userBean.getUsername());
             jsonObject.put("loverName",userBean.getLoverName()==null?"":userBean.getLoverName());
+            jsonObject.put("encryptedPassword",userBean.getEncryptedPassword()==null?"":userBean.getEncryptedPassword());
             jsonObject.put("name",userBean.getName()==null?"":userBean.getName());
             jsonObject.put("sex",userBean.getSex()==null?"":userBean.getSex());
             jsonObject.put("birthday",userBean.getBirthday()==null?"":userBean.getBirthday());
@@ -37,7 +38,8 @@ public class UserBeanJsonUtil {
         try {
             userBean.setId(jsonObject.getInt("id"));
             userBean.setUsername(jsonObject.getString("username").equals("") ? null : jsonObject.getString("username"));
-            userBean.setLoverName(jsonObject.getString("loverName").equals("") ?null : jsonObject.getString("loverName"));
+            userBean.setLoverName(jsonObject.getString("loverName").equals("") ? null : jsonObject.getString("loverName"));
+            userBean.setEncryptedPassword(jsonObject.getString("encryptedPassword").equals("") ? null : jsonObject.getString("encryptedPassword"));
             userBean.setName(jsonObject.getString("name").equals("") ? null : jsonObject.getString("name"));
             userBean.setSex(jsonObject.getString("sex").equals("") ? null : jsonObject.getString("sex"));
             userBean.setBirthday(jsonObject.getString("birthday").equals("") ? null : jsonObject.getString("birthday"));
